@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div>Iniciar Sesion</div>
+
+
+        <input type="text" id="user" name="usuario" placeholder="usuario"/>
+        <input type="password" id="pass" name="clave" placeholder="clave"/>
+        <button onclick="logear()">Login</button>
+        <button onclick="Consultar()">Consultar</button>
+
+        <div id="rpt"></div>
+        <br><br>
+        <table id="mytable" cellpadding="1" border="1" style="border-collapse:collapse; width: 70% ">
+            <tr>
+                <th>id</th>
+                <th>marca</th>
+                <th>precio</th>
+                <th>color</th>
+                <th>Acciones</th>
+            </tr>
+
+        </table>
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script type="text/javascript">
+            function borrar(btn, id_vehiculo) {
+                console.log(id_vehiculo);
+
+                var respuesta = prompt('Escribe SI Para eliminar.');
+                if (respuesta == "SI") {
+                    var fila = btn.closest('tr');
+
+                    $.ajax({
+                        method: 'POST',
+                        url : 'EliminarServlet',
+                        data: {
+                            id_ve: id_vehiculo
+                        },
+                        success: function (msg) {
+                            console.log('MSG:', msg);
+                            fila.remove();
+                            //alert(msg.mensaje);
+                        },
+                        error: function (msg) {
+                            console.error('ERROR:', msg);
+                        }
+                    });
+                }
+            }
+            function Consultar() {
+                $.ajax({
+
+                    method: 'POST',
+                    url: 'Consulta',
+
+                    success: function (msg) {
+                        // console.log(msg);
+                        var tabla = document.getElementById("mytable");
+
+                        for (var i = 0; i < msg.length; i++) {
+
+                            console.log(msg[i]);
+
+
+                            var fila = tabla.insertRow(1);
+
+                            var celda0 = fila.insertCell(0);
+                            var celda1 = fila.insertCell(1);
+                            var celda2 = fila.insertCell(2);
+                            var celda3 = fila.insertCell(3);
+                            var celda4 = fila.insertCell(4);
+
+                            celda0.innerHTML = msg[i].id_vehiculo;
+                            celda1.innerHTML = msg[i].marca;
+                            celda2.innerHTML = msg[i].precio;
+                            celda3.innerHTML = msg[i].color;
+                            celda4.innerHTML = '<button onclick="borrar(this,'+msg[i].id_vehiculo+')">Borrar</button>';
+                            //console.log(tabla);
+                        }
+
+                    },
+                    error: function (msg) {
+                        console.error(msg);
+                    }
+                });
+            }
+            function logear() {
+                var usuario = document.getElementById("user").value;
+                var clave = document.getElementById("pass").value;
+                console.log('haciendo el login...' + usuario + ' clave: ' + clave);
+                $.ajax({
+
+                    method: 'POST',
+                    url: 'MiServlet',
+                    data: {
+                        usuario: usuario,
+                        clave: clave
+                    },
+                    success: function (msg) {
+                        console.log(msg);
+                        document.getElementById('rpt').innerHTML = msg.msg;
+                    },
+                    error: function (msg) {
+                        console.error(msg);
+                    }
+                });
+            }
+
+        </script>
+
+
+    </body>
+</html>
